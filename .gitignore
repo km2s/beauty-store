@@ -1,0 +1,23 @@
+# ── Backend ───────────────────────────────────────────────────────────────────
+backend/venv/
+backend/.env
+**/__pycache__/
+*.pyc
+*.pyo
+
+# ── Frontend ──────────────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env.local
+frontend/.env*.local
+frontend/.vercel/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# ── Geral ─────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.pem
+*.log

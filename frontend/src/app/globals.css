@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --brand: #c9a96e;
+  --brand-dark: #a07840;
+  --brand-light: #f5efe6;
+  --foreground: #1a1a1a;
+  --muted: #6b6b6b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  color: var(--foreground);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+html { scroll-behavior: smooth; }
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
