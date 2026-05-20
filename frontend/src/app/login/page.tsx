@@ -26,7 +26,12 @@ export default function LoginPage() {
       }
       const res = await api.post("/auth/login", { email: form.email, password: form.password });
       setAuth(res.data.user, res.data.access_token);
-      router.push("/conta");
+      try {
+        await api.get("/admin/stats", { headers: { Authorization: `Bearer ${res.data.access_token}` } });
+        router.push("/admin/dashboard");
+      } catch {
+        router.push("/conta");
+      }
     } catch (err: any) {
       if (!err?.response) {
         setError("Não foi possível conectar ao servidor. Verifique se o backend está rodando.");
