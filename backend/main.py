@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import products, collections, auth, users, cart, orders, payments, quiz, waitlist, points, affiliates
+from app.routers import products, collections, auth, users, cart, orders, payments, quiz, waitlist, points, affiliates, admin
 
 app = FastAPI(title="Beauty Store API", version="1.0.0")
 
@@ -44,6 +44,7 @@ app.include_router(quiz.router, prefix="/quiz", tags=["quiz"])
 app.include_router(waitlist.router, prefix="/waitlist", tags=["waitlist"])
 app.include_router(points.router, prefix="/points", tags=["points"])
 app.include_router(affiliates.router, prefix="/affiliates", tags=["affiliates"])
+app.include_router(admin.router, prefix="/admin", tags=["admin"])
 
 
 @app.get("/")

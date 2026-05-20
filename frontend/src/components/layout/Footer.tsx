@@ -30,9 +30,15 @@ export default function Footer() {
             Produtos
           </h3>
           <ul className="space-y-2 text-sm text-gray-400">
-            {["Skincare", "Maquiagem", "Corpo & Banho", "Kits & Presentes", "Lançamentos"].map((item) => (
-              <li key={item}>
-                <Link href="#" className="hover:text-white transition-colors">{item}</Link>
+            {[
+              { label: "Skincare",         href: "/colecao/skincare" },
+              { label: "Maquiagem",        href: "/colecao/maquiagem" },
+              { label: "Corpo & Banho",    href: "/colecao/corpo-e-banho" },
+              { label: "Kits & Presentes", href: "/colecao/kits-e-presentes" },
+              { label: "Lançamentos",      href: "/colecao/lancamentos" },
+            ].map((item) => (
+              <li key={item.label}>
+                <Link href={item.href} className="hover:text-white transition-colors">{item.label}</Link>
               </li>
             ))}
           </ul>
@@ -43,9 +49,15 @@ export default function Footer() {
             Ajuda
           </h3>
           <ul className="space-y-2 text-sm text-gray-400">
-            {["Minha Conta", "Rastrear Pedido", "Trocas & Devoluções", "Fale Conosco", "FAQ"].map((item) => (
-              <li key={item}>
-                <Link href="#" className="hover:text-white transition-colors">{item}</Link>
+            {[
+              { label: "Minha Conta",        href: "/conta" },
+              { label: "Rastrear Pedido",    href: "/rastrear" },
+              { label: "Trocas & Devoluções",href: "/trocas" },
+              { label: "Fale Conosco",       href: "/contato" },
+              { label: "FAQ",                href: "/faq" },
+            ].map((item) => (
+              <li key={item.label}>
+                <Link href={item.href} className="hover:text-white transition-colors">{item.label}</Link>
               </li>
             ))}
           </ul>
