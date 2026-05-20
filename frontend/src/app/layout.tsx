@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import CartDrawer from "@/components/cart/CartDrawer";
+import StoreLayout from "@/components/layout/StoreLayout";
 import AnalyticsProvider from "@/components/analytics/AnalyticsProvider";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 
@@ -40,10 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={inter.variable}>
       <body className="min-h-screen flex flex-col antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CartDrawer />
+        <StoreLayout>{children}</StoreLayout>
         <AnalyticsProvider />
         <OrganizationJsonLd />
       </body>
