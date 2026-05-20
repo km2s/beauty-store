@@ -1,37 +1,47 @@
-from fastapi import FastAPI
+import os
+import re as _re
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.routers import products, collections, auth, users, cart, orders, payments, quiz, waitlist, points, affiliates, admin
 
 app = FastAPI(title="Beauty Store API", version="1.0.0")
 
-import os
+_CORS_ORIGIN_RE = _re.compile(r"https://[\w][\w\-]*\.vercel\.app$")
+_ALLOWED_ORIGINS_STATIC = {
+    "http://localhost:3000",
+    "http://localhost:3001",
+    os.getenv("FRONTEND_URL", ""),
+}
+
+def _cors_origin(request: Request) -> str:
+    origin = request.headers.get("origin", "")
+    if origin in _ALLOWED_ORIGINS_STATIC or _CORS_ORIGIN_RE.match(origin):
+        return origin
+    return ""
 
 def _build_origins() -> list[str]:
-    origins = ["http://localhost:3000", "http://localhost:3001"]
-
-    # URL do frontend configurada explicitamente (deve ser a URL do Vercel)
-    frontend_url = os.getenv("FRONTEND_URL", "")
-    if frontend_url and not frontend_url.endswith("railway.com"):
-        origins.append(frontend_url)
-
-    # VERCEL_URL injetado pelo Railway/Vercel pode vir sem protocolo
+    origins = list(_ALLOWED_ORIGINS_STATIC)
     vercel_url = os.getenv("VERCEL_URL", "")
     if vercel_url:
-        if not vercel_url.startswith("http"):
-            vercel_url = f"https://{vercel_url}"
-        origins.append(vercel_url)
-
+        origins.append(vercel_url if vercel_url.startswith("http") else f"https://{vercel_url}")
     return [o for o in origins if o]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_build_origins(),
-    # Cobre todos os deploys de preview e produção do Vercel
-    allow_origin_regex=r"https://[\w\-]+\.vercel\.app",
+    allow_origin_regex=r"https://[\w][\w\-]*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Garante headers CORS mesmo em respostas de erro 500
+@app.exception_handler(Exception)
+async def _global_error_handler(request: Request, exc: Exception):
+    origin = _cors_origin(request)
+    headers = {"Access-Control-Allow-Origin": origin, "Access-Control-Allow-Credentials": "true"} if origin else {}
+    return JSONResponse(status_code=500, content={"detail": str(exc)}, headers=headers)
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(users.router, prefix="/users", tags=["users"])
