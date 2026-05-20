@@ -1,6 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, User, Search, Menu, X, ChevronDown } from "lucide-react";
 import { useCartStore } from "@/store/cart";
@@ -31,12 +32,17 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+
   const count = useCartStore((s) => s.count());
   const openCart = useCartStore((s) => s.openCart);
-  const { user, isLoggedIn } = useAuthStore();
+  const { isLoggedIn } = useAuthStore();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -44,23 +50,74 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (searchOpen) searchRef.current?.focus();
+  }, [searchOpen]);
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    router.push(`/colecao/skincare?q=${encodeURIComponent(searchQuery.trim())}`);
+    setSearchOpen(false);
+    setSearchQuery("");
+  }
+
+  function toggleSearch() {
+    setSearchOpen((v) => !v);
+    if (searchOpen) setSearchQuery("");
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-white shadow-sm" : "bg-white/95 backdrop-blur-sm"
       }`}
     >
-      {/* Faixa topo */}
+      {/* Faixa de anúncio */}
       <div className="bg-[#1a1a1a] text-white text-center text-xs py-2 tracking-wider">
-        FRETE GRÁTIS acima de R$299 · Parcelamento em até 6x sem juros
+        ✦&nbsp; FRETE GRÁTIS acima de R$299 &nbsp;·&nbsp; Parcelamento em até 6x sem juros &nbsp;✦
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="text-xl font-semibold tracking-widest uppercase">
+          <Link href="/" className="text-xl font-semibold tracking-widest uppercase shrink-0">
             Beauty<span className="text-[#c9a96e]">.</span>
           </Link>
+
+          {/* Barra de busca expandida */}
+          <AnimatePresence>
+            {searchOpen && (
+              <motion.form
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "100%" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+                onSubmit={handleSearch}
+                className="absolute left-0 right-0 top-0 bottom-0 bg-white flex items-end pb-2 px-4 sm:px-6 overflow-hidden"
+                style={{ top: "2rem" }}
+              >
+                <div className="flex items-center gap-3 w-full max-w-7xl mx-auto border-b-2 border-[#c9a96e]">
+                  <Search size={18} className="text-[#c9a96e] shrink-0" />
+                  <input
+                    ref={searchRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar produtos..."
+                    className="flex-1 py-2 text-sm text-[#1a1a1a] placeholder-gray-400 focus:outline-none bg-transparent"
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleSearch}
+                    className="p-1 text-gray-400 hover:text-gray-600 shrink-0"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
 
           {/* Nav desktop */}
           <nav className="hidden md:flex items-center gap-8">
@@ -86,7 +143,7 @@ export default function Header() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl p-4 min-w-[180px]"
+                      className="absolute top-full left-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl p-4 min-w-44"
                     >
                       {link.sub.map((s) => (
                         <Link
@@ -106,7 +163,11 @@ export default function Header() {
 
           {/* Ações direita */}
           <div className="flex items-center gap-3">
-            <button className="hidden md:flex p-2 text-gray-600 hover:text-[#c9a96e] transition-colors">
+            <button
+              onClick={toggleSearch}
+              className="hidden md:flex p-2 text-gray-600 hover:text-[#c9a96e] transition-colors"
+              aria-label="Buscar"
+            >
               <Search size={20} />
             </button>
 
@@ -152,18 +213,34 @@ export default function Header() {
             exit={{ height: 0, opacity: 0 }}
             className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
           >
-            <div className="px-6 py-4 flex flex-col gap-4">
+            <div className="px-6 py-4 flex flex-col gap-1">
+              {/* Busca mobile */}
+              <form onSubmit={handleSearch} className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2.5 mb-3">
+                <Search size={16} className="text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar produtos..."
+                  className="flex-1 text-sm focus:outline-none bg-transparent"
+                />
+              </form>
+
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-sm font-medium text-gray-700 py-1"
+                  className="text-sm font-medium text-gray-700 py-2.5 border-b border-gray-50 last:border-0"
                 >
                   {link.label}
                 </Link>
               ))}
-              <Link href="/login" className="text-sm text-gray-500 py-1">
+              <Link
+                href={isLoggedIn() ? "/conta" : "/login"}
+                onClick={() => setMobileOpen(false)}
+                className="text-sm text-gray-500 py-2.5"
+              >
                 Minha conta
               </Link>
             </div>

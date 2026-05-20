@@ -12,11 +12,6 @@ const fadeUp = (delay = 0) => ({
 export default function Hero() {
   return (
     <section className="flex flex-col overflow-hidden bg-[#fdf8f2] pt-16">
-      {/* Announcement bar */}
-      <div className="bg-[#1a1a1a] text-white text-xs py-2.5 text-center tracking-widest font-medium">
-        ✦&nbsp; FRETE GRÁTIS EM PEDIDOS ACIMA DE R$299 &nbsp;·&nbsp; NOVA COLEÇÃO DISPONÍVEL &nbsp;✦
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-10 items-center py-20 md:py-28">
         {/* ── Texto ── */}
         <div>
